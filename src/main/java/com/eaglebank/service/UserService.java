@@ -4,10 +4,14 @@ import com.eaglebank.dto.AddressDto;
 import com.eaglebank.dto.UserRequest;
 import com.eaglebank.dto.UserResponse;
 import com.eaglebank.entity.Address;
+import com.eaglebank.entity.PasswordSetupTokenEntity;
 import com.eaglebank.entity.User;
 import com.eaglebank.exception.BadRequestException;
+import com.eaglebank.repository.PasswordSetupTokenRepository;
 import com.eaglebank.repository.UserRepository;
+import java.time.Duration;
 import java.time.Instant;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +20,7 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
   private final UserRepository repo;
+  private final PasswordSetupTokenRepository tokenRepo;
 
   public UserResponse createUser(UserRequest req) {
     if (req.getEmail() == null) {
@@ -26,6 +31,14 @@ public class UserService {
       throw new BadRequestException("Email exists");
     }
 
+    User user = saveUser(req);
+
+    String token = generatePasswordSetupToken(user);
+
+    return mapToUserResponse(user, token);
+  }
+
+  private User saveUser(UserRequest req) {
     Address addr = null;
     if (req.getAddress() != null) {
       AddressDto address = req.getAddress();
@@ -51,11 +64,10 @@ public class UserService {
             .build();
 
     repo.save(user);
-
-    return mapToUserResponse(user);
+    return user;
   }
 
-  private UserResponse mapToUserResponse(User user) {
+  private UserResponse mapToUserResponse(User user, String token) {
     AddressDto address = null;
     if (user.getAddress() != null) {
       address =
@@ -77,7 +89,22 @@ public class UserService {
         .email(user.getEmail())
         .createdTimestamp(user.getCreatedTimestamp())
         .updatedTimestamp(user.getUpdatedTimestamp())
-        .passwordSetupToken(null)
+        .passwordSetupToken(token)
         .build();
+  }
+
+  // TODO: 09/05/2026 this should move to separate service
+  private String generatePasswordSetupToken(User user) {
+    String token = UUID.randomUUID().toString();
+    PasswordSetupTokenEntity entity =
+        PasswordSetupTokenEntity.builder()
+            .user(user)
+            .tokenHash(token)
+            .expiresAt(Instant.now().plus(Duration.ofDays(1)))
+            .used(false)
+            .build();
+
+    tokenRepo.save(entity);
+    return token;
   }
 }
