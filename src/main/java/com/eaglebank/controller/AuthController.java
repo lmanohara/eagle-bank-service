@@ -1,12 +1,14 @@
 package com.eaglebank.controller;
 
 import com.eaglebank.dto.AuthResponse;
+import com.eaglebank.dto.SetPasswordRequest;
 import com.eaglebank.service.AuthService;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,6 +49,15 @@ public class AuthController {
       return new AuthResponse(token);
     } catch (Exception e) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
+    }
+  }
+
+  @PostMapping("/set-password")
+  public void setPassword(@RequestBody SetPasswordRequest req) {
+    try {
+      authService.setPassword(req);
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
     }
   }
 }

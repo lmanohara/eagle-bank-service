@@ -28,7 +28,7 @@ public class SecurityConfig {
             auth ->
                 auth.requestMatchers("/v1/auth/**")
                     .permitAll()
-                    .requestMatchers(HttpMethod.POST, "/v1/users")
+                    .requestMatchers(HttpMethod.POST, "/v1/users", "/v1/auth/set-password")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
