@@ -18,4 +18,5 @@ public class UserResponse {
   private String email;
   private Instant createdTimestamp;
   private Instant updatedTimestamp;
+  private String passwordSetupToken;
 }

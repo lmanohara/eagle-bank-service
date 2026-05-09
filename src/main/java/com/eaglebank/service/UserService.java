@@ -77,6 +77,7 @@ public class UserService {
         .email(user.getEmail())
         .createdTimestamp(user.getCreatedTimestamp())
         .updatedTimestamp(user.getUpdatedTimestamp())
+        .passwordSetupToken(null)
         .build();
   }
 }
