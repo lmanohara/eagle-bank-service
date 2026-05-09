@@ -3,6 +3,7 @@ package com.eaglebank.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.time.Instant;
 
 @Entity
 @Table(name = "users")
@@ -18,4 +19,17 @@ public class User {
     private String username;
 
     private String password;
+
+    private String name;
+
+    @Embedded
+    private Address address;
+
+    private String phoneNumber;
+
+    @Column(unique = true)
+    private String email;
+
+    private Instant createdTimestamp;
+    private Instant updatedTimestamp;
 }
