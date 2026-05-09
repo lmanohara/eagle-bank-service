@@ -1,4 +1,3 @@
-
 package com.eaglebank.controller;
 
 import com.eaglebank.dto.AuthResponse;
@@ -18,35 +17,36 @@ import org.springframework.web.server.ResponseStatusException;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthService authService;
+  private final AuthService authService;
 
-    @PostMapping("/login")
-    public AuthResponse login(@RequestHeader(value = "Authorization", required = false) String authorization) {
-        if (authorization == null || !authorization.startsWith("Basic ")) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing Basic auth header");
-        }
-
-        String base64Creds = authorization.substring(6).trim();
-        String decoded;
-        try {
-            decoded = new String(Base64.getDecoder().decode(base64Creds), StandardCharsets.UTF_8);
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Basic auth encoding");
-        }
-
-        int idx = decoded.indexOf(':');
-        if (idx <= 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Basic auth format");
-        }
-
-        String username = decoded.substring(0, idx);
-        String password = decoded.substring(idx + 1);
-
-        try {
-            String token = authService.authenticate(username, password);
-            return new AuthResponse(token);
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
-        }
+  @PostMapping("/login")
+  public AuthResponse login(
+      @RequestHeader(value = "Authorization", required = false) String authorization) {
+    if (authorization == null || !authorization.startsWith("Basic ")) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing Basic auth header");
     }
+
+    String base64Creds = authorization.substring(6).trim();
+    String decoded;
+    try {
+      decoded = new String(Base64.getDecoder().decode(base64Creds), StandardCharsets.UTF_8);
+    } catch (IllegalArgumentException e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Basic auth encoding");
+    }
+
+    int idx = decoded.indexOf(':');
+    if (idx <= 0) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Basic auth format");
+    }
+
+    String username = decoded.substring(0, idx);
+    String password = decoded.substring(idx + 1);
+
+    try {
+      String token = authService.authenticate(username, password);
+      return new AuthResponse(token);
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
+    }
+  }
 }

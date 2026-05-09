@@ -11,18 +11,19 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final UserRepository repo;
-    private final PasswordEncoder encoder;
-    private final JwtService jwtService;
+  private final UserRepository repo;
+  private final PasswordEncoder encoder;
+  private final JwtService jwtService;
 
-    public String authenticate(String username, String password) {
-        var user = repo.findByUsername(username)
-                .orElseThrow(() -> new BadCredentialsException("Invalid username or password"));
+  public String authenticate(String username, String password) {
+    var user =
+        repo.findByUsername(username)
+            .orElseThrow(() -> new BadCredentialsException("Invalid username or password"));
 
-        if (!encoder.matches(password, user.getPassword())) {
-            throw new BadCredentialsException("Invalid username or password");
-        }
-
-        return jwtService.generateToken(user.getUsername());
+    if (!encoder.matches(password, user.getPassword())) {
+      throw new BadCredentialsException("Invalid username or password");
     }
+
+    return jwtService.generateToken(user.getUsername());
+  }
 }

@@ -1,48 +1,82 @@
-
 package com.eaglebank.service;
 
+import com.eaglebank.dto.AddressDto;
 import com.eaglebank.dto.UserRequest;
+import com.eaglebank.dto.UserResponse;
 import com.eaglebank.entity.Address;
 import com.eaglebank.entity.User;
 import com.eaglebank.exception.BadRequestException;
 import com.eaglebank.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
 import java.time.Instant;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserRepository repo;
+  private final UserRepository repo;
 
-    public User createUser(UserRequest req) {
-        if (req.getEmail() == null) {
-            throw new BadRequestException("Email is required");
-        }
-
-        if (repo.findByEmail(req.getEmail()).isPresent()) {
-            throw new BadRequestException("Email exists");
-        }
-
-        User u = new User();
-        u.setName(req.getName());
-        u.setEmail(req.getEmail());
-        u.setPhoneNumber(req.getPhoneNumber());
-
-        if (req.getAddress() != null) {
-            var a = req.getAddress();
-            Address addr = new Address(
-                    a.getLine1(), a.getLine2(), a.getLine3(), a.getTown(), a.getCounty(), a.getPostcode()
-            );
-            u.setAddress(addr);
-        }
-
-        // username/password are set via a separate auth endpoint
-        u.setCreatedTimestamp(Instant.now());
-        u.setUpdatedTimestamp(Instant.now());
-        return repo.save(u);
+  public UserResponse createUser(UserRequest req) {
+    if (req.getEmail() == null) {
+      throw new BadRequestException("Email is required");
     }
+
+    if (repo.findByEmail(req.getEmail()).isPresent()) {
+      throw new BadRequestException("Email exists");
+    }
+
+    Address addr = null;
+    if (req.getAddress() != null) {
+      AddressDto address = req.getAddress();
+      addr =
+          Address.builder()
+              .line1(address.getLine1())
+              .line2(address.getLine2())
+              .line3(address.getLine3())
+              .town(address.getTown())
+              .county(address.getCounty())
+              .postcode(address.getPostcode())
+              .build();
+    }
+
+    User user =
+        User.builder()
+            .name(req.getName())
+            .email(req.getEmail())
+            .phoneNumber(req.getPhoneNumber())
+            .address(addr)
+            .createdTimestamp(Instant.now())
+            .updatedTimestamp(Instant.now())
+            .build();
+
+    repo.save(user);
+
+    return mapToUserResponse(user);
+  }
+
+  private UserResponse mapToUserResponse(User user) {
+    AddressDto address = null;
+    if (user.getAddress() != null) {
+      address =
+          AddressDto.builder()
+              .line1(user.getAddress().getLine1())
+              .line2(user.getAddress().getLine2())
+              .line3(user.getAddress().getLine3())
+              .town(user.getAddress().getTown())
+              .county(user.getAddress().getCounty())
+              .postcode(user.getAddress().getPostcode())
+              .build();
+    }
+
+    return UserResponse.builder()
+        .id(user.getId() == null ? null : user.getId().toString())
+        .name(user.getName())
+        .address(address)
+        .phoneNumber(user.getPhoneNumber())
+        .email(user.getEmail())
+        .createdTimestamp(user.getCreatedTimestamp())
+        .updatedTimestamp(user.getUpdatedTimestamp())
+        .build();
+  }
 }

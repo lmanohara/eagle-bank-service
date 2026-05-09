@@ -1,4 +1,3 @@
-
 package com.eaglebank.dto;
 
 import jakarta.validation.Valid;
@@ -8,15 +7,11 @@ import lombok.Data;
 
 @Data
 public class UserRequest {
-    @NotBlank
-    private String name;
+  @NotBlank private String name;
 
-    @Valid
-    private AddressDto address;
+  @Valid private AddressDto address;
 
-    private String phoneNumber;
+  private String phoneNumber;
 
-    @Email
-    @NotBlank
-    private String email;
+  @Email @NotBlank private String email;
 }

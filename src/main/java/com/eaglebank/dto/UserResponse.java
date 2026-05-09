@@ -1,18 +1,21 @@
 package com.eaglebank.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
 import java.time.Instant;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class UserResponse {
-    private String id;
-    private String name;
-    private AddressDto address;
-    private String phoneNumber;
-    private String email;
-    private Instant createdTimestamp;
-    private Instant updatedTimestamp;
+  private String id;
+  private String name;
+  private AddressDto address;
+  private String phoneNumber;
+  private String email;
+  private Instant createdTimestamp;
+  private Instant updatedTimestamp;
 }
