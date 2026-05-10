@@ -51,11 +51,6 @@ public class AuthService {
     }
 
     User user = token.getUser();
-    //    if (user == null
-    //        || user.getUsername() == null
-    //        || !user.getUsername().equals(request.getUsername())) {
-    //      throw new BadCredentialsException("Token does not match user");
-    //    }
 
     if (user == null) {
       throw new BadCredentialsException("Token does not match user");

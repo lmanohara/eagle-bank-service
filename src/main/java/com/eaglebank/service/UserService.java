@@ -94,8 +94,13 @@ public class UserService {
         .build();
   }
 
-  public UserResponse getUserById(String id) {
+  public UserResponse getUserById(String id, String authUsername) {
     User user = repo.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+
+    if (user.getUsername() == null || !user.getUsername().equals(authUsername)) {
+      throw new RuntimeException("Forbidden");
+    }
+
     return mapToUserResponse(user, null);
   }
 

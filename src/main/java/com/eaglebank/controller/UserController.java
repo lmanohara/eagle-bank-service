@@ -5,6 +5,7 @@ import com.eaglebank.dto.UserResponse;
 import com.eaglebank.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,7 +21,8 @@ public class UserController {
   }
 
   @GetMapping("/{userId}")
-  public UserResponse getUser(@PathVariable("userId") String userId) {
-    return service.getUserById(userId);
+  public UserResponse getUser(
+      @PathVariable("userId") String userId, @AuthenticationPrincipal String authUsername) {
+    return service.getUserById(userId, authUsername);
   }
 }

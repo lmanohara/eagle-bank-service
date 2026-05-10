@@ -1,5 +1,6 @@
 package com.eaglebank.exception;
 
+import com.eaglebank.dto.ErrorResponse;
 import java.util.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -10,7 +11,8 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(BadRequestException.class)
   public ResponseEntity<?> badRequest(BadRequestException ex) {
-    return ResponseEntity.badRequest().body(ex.getMessage());
+    ErrorResponse errorResponse = ErrorResponse.builder().message(ex.getMessage()).build();
+    return ResponseEntity.badRequest().body(errorResponse);
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)

@@ -4,10 +4,10 @@ import com.eaglebank.dto.TransactionRequest;
 import com.eaglebank.dto.TransactionResponse;
 import com.eaglebank.dto.TransactionsResponse;
 import com.eaglebank.service.AccountTransactionService;
-import com.eaglebank.util.AuthUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,8 +26,12 @@ public class AccountTransactionController {
   @PostMapping("/{accountNumber}/transactions")
   public TransactionResponse transact(
       @PathVariable("accountNumber") String accountNumber,
-      @Valid @RequestBody TransactionRequest req) {
-    String username = AuthUtils.requireAuthenticatedUsername();
+      @Valid @RequestBody TransactionRequest req,
+      @AuthenticationPrincipal String authUsername) {
+    if (authUsername == null) {
+      throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.UNAUTHORIZED, "Not authenticated");
+    }
+    String username = authUsername;
 
     try {
       return accountTransactionService.createTransaction(accountNumber, username, req);
@@ -46,8 +50,12 @@ public class AccountTransactionController {
 
   @GetMapping("/{accountNumber}/transactions")
   public TransactionsResponse listTransactions(
-      @PathVariable("accountNumber") String accountNumber) {
-    String username = AuthUtils.requireAuthenticatedUsername();
+      @PathVariable("accountNumber") String accountNumber,
+      @AuthenticationPrincipal String authUsername) {
+    if (authUsername == null) {
+      throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.UNAUTHORIZED, "Not authenticated");
+    }
+    String username = authUsername;
 
     try {
       return accountTransactionService.listTransactions(accountNumber, username);
@@ -63,8 +71,12 @@ public class AccountTransactionController {
   @GetMapping("/{accountNumber}/transactions/{transactionId}")
   public TransactionResponse getTransaction(
       @PathVariable("accountNumber") String accountNumber,
-      @PathVariable("transactionId") String transactionId) {
-    String username = AuthUtils.requireAuthenticatedUsername();
+      @PathVariable("transactionId") String transactionId,
+      @AuthenticationPrincipal String authUsername) {
+    if (authUsername == null) {
+      throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.UNAUTHORIZED, "Not authenticated");
+    }
+    String username = authUsername;
 
     try {
       return accountTransactionService.getTransaction(accountNumber, transactionId, username);
