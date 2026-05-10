@@ -1,9 +1,12 @@
 package com.eaglebank.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
 public class AccountRequest {
-  private String name;
-  private String accountType;
+
+  @NotBlank private String name;
+
+  @NotBlank private String accountType;
 }

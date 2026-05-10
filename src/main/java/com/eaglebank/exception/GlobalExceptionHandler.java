@@ -1,8 +1,8 @@
 package com.eaglebank.exception;
 
 import com.eaglebank.dto.ErrorResponse;
-import java.util.HashMap;
-import java.util.Map;
+import com.eaglebank.dto.ValidationError;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -28,13 +28,19 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ErrorResponse> validation(MethodArgumentNotValidException exception) {
-    Map<String, String> fieldErrors = new HashMap<>();
-    exception
-        .getBindingResult()
-        .getFieldErrors()
-        .forEach(e -> fieldErrors.put(e.getField(), e.getDefaultMessage()));
+    List<ValidationError> details =
+        exception.getBindingResult().getFieldErrors().stream()
+            .map(
+                e ->
+                    ValidationError.builder()
+                        .field(e.getField())
+                        .message(e.getDefaultMessage())
+                        .type(e.getCode())
+                        .build())
+            .toList();
+
     ErrorResponse errorResponse =
-        ErrorResponse.builder().message("Validation failed").details(fieldErrors).build();
+        ErrorResponse.builder().message("Validation failed").details(details).build();
 
     return ResponseEntity.badRequest().body(errorResponse);
   }
