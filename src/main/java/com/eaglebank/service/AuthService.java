@@ -17,14 +17,15 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuthService {
 
-  private final UserRepository repo;
+  private final UserRepository userRepo;
   private final PasswordEncoder encoder;
   private final JwtService jwtService;
   private final PasswordSetupTokenRepository tokenRepo;
 
   public String authenticate(String username, String password) {
     var user =
-        repo.findByUsername(username)
+        userRepo
+            .findByUsername(username)
             .orElseThrow(() -> new BadCredentialsException("Invalid username or password"));
 
     if (!encoder.matches(password, user.getPassword())) {
@@ -38,7 +39,7 @@ public class AuthService {
   public void setPassword(SetPasswordRequest request) {
     PasswordSetupTokenEntity token =
         tokenRepo
-            .findByTokenHash(request.getToken())
+            .findByTokenHashJoinUser(request.getToken())
             .orElseThrow(() -> new BadCredentialsException("Invalid token"));
 
     if (token.isUsed()) {
@@ -50,14 +51,19 @@ public class AuthService {
     }
 
     User user = token.getUser();
-    if (user == null
-        || user.getUsername() == null
-        || !user.getUsername().equals(request.getUsername())) {
+    //    if (user == null
+    //        || user.getUsername() == null
+    //        || !user.getUsername().equals(request.getUsername())) {
+    //      throw new BadCredentialsException("Token does not match user");
+    //    }
+
+    if (user == null) {
       throw new BadCredentialsException("Token does not match user");
     }
 
+    user.setUsername(request.getUsername());
     user.setPassword(encoder.encode(request.getPassword()));
-    repo.save(user);
+    userRepo.save(user);
 
     token.setUsed(true);
     tokenRepo.save(token);

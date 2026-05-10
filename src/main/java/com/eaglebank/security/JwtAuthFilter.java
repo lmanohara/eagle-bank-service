@@ -17,6 +17,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
   private final JwtService jwtService;
 
   @Override
+  protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+    String path = request.getRequestURI();
+    // Skip filtering for public auth endpoints and user creation
+    if (path.startsWith("/v1/auth")) return true;
+    if ("/v1/users".equals(path) && "POST".equalsIgnoreCase(request.getMethod())) return true;
+
+    return false;
+  }
+
+  @Override
   protected void doFilterInternal(
       HttpServletRequest request,
       jakarta.servlet.http.HttpServletResponse response,
