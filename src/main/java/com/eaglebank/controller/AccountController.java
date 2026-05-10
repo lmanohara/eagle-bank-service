@@ -2,11 +2,13 @@ package com.eaglebank.controller;
 
 import com.eaglebank.dto.AccountRequest;
 import com.eaglebank.dto.AccountResponse;
+import com.eaglebank.dto.AccountsResponse;
 import com.eaglebank.service.AccountService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,5 +31,17 @@ public class AccountController {
 
     String username = auth.getName();
     return accountService.createForUser(username, req);
+  }
+
+  @GetMapping
+  public AccountsResponse listForUser() {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    if (auth == null || !auth.isAuthenticated() || auth.getName() == null) {
+      throw new org.springframework.web.server.ResponseStatusException(
+          org.springframework.http.HttpStatus.UNAUTHORIZED, "Not authenticated");
+    }
+
+    String username = auth.getName();
+    return accountService.listForUser(username);
   }
 }
