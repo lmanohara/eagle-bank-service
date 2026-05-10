@@ -27,7 +27,8 @@ public class AccountController {
   public AccountResponse create(
       @Valid @RequestBody AccountRequest req, @AuthenticationPrincipal String authUsername) {
     if (authUsername == null) {
-      throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.UNAUTHORIZED, "Not authenticated");
+      throw new org.springframework.web.server.ResponseStatusException(
+          org.springframework.http.HttpStatus.UNAUTHORIZED, "Not authenticated");
     }
     return accountService.createForUser(authUsername, req);
   }
@@ -35,15 +36,19 @@ public class AccountController {
   @GetMapping
   public AccountsResponse listForUser(@AuthenticationPrincipal String authUsername) {
     if (authUsername == null) {
-      throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.UNAUTHORIZED, "Not authenticated");
+      throw new org.springframework.web.server.ResponseStatusException(
+          org.springframework.http.HttpStatus.UNAUTHORIZED, "Not authenticated");
     }
     return accountService.listForUser(authUsername);
   }
 
   @GetMapping("/{accountNumber}")
-  public AccountResponse getOne(@PathVariable("accountNumber") String accountNumber, @AuthenticationPrincipal String authUsername) {
+  public AccountResponse getOne(
+      @PathVariable("accountNumber") String accountNumber,
+      @AuthenticationPrincipal String authUsername) {
     if (authUsername == null) {
-      throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.UNAUTHORIZED, "Not authenticated");
+      throw new org.springframework.web.server.ResponseStatusException(
+          org.springframework.http.HttpStatus.UNAUTHORIZED, "Not authenticated");
     }
 
     try {

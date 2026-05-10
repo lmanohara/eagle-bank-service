@@ -29,7 +29,8 @@ public class AccountTransactionController {
       @Valid @RequestBody TransactionRequest req,
       @AuthenticationPrincipal String authUsername) {
     if (authUsername == null) {
-      throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.UNAUTHORIZED, "Not authenticated");
+      throw new org.springframework.web.server.ResponseStatusException(
+          org.springframework.http.HttpStatus.UNAUTHORIZED, "Not authenticated");
     }
     String username = authUsername;
 
@@ -53,7 +54,8 @@ public class AccountTransactionController {
       @PathVariable("accountNumber") String accountNumber,
       @AuthenticationPrincipal String authUsername) {
     if (authUsername == null) {
-      throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.UNAUTHORIZED, "Not authenticated");
+      throw new org.springframework.web.server.ResponseStatusException(
+          org.springframework.http.HttpStatus.UNAUTHORIZED, "Not authenticated");
     }
     String username = authUsername;
 
@@ -74,7 +76,8 @@ public class AccountTransactionController {
       @PathVariable("transactionId") String transactionId,
       @AuthenticationPrincipal String authUsername) {
     if (authUsername == null) {
-      throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.UNAUTHORIZED, "Not authenticated");
+      throw new org.springframework.web.server.ResponseStatusException(
+          org.springframework.http.HttpStatus.UNAUTHORIZED, "Not authenticated");
     }
     String username = authUsername;
 
