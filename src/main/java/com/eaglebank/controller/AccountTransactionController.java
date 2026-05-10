@@ -36,11 +36,11 @@ public class AccountTransactionController {
 
     try {
       return accountTransactionService.createTransaction(accountNumber, username, req);
+    } catch (com.eaglebank.exception.AccessDeniedException ade) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not allowed");
     } catch (RuntimeException e) {
       String msg = e.getMessage();
-      if ("Forbidden".equals(msg)) {
-        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not allowed");
-      } else if ("Insufficient funds".equals(msg)) {
+      if ("Insufficient funds".equals(msg)) {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Insufficient funds");
       } else if ("Invalid amount".equals(msg) || "Invalid transaction type".equals(msg)) {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, msg);
@@ -61,11 +61,9 @@ public class AccountTransactionController {
 
     try {
       return accountTransactionService.listTransactions(accountNumber, username);
+    } catch (com.eaglebank.exception.AccessDeniedException ade) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not allowed");
     } catch (RuntimeException e) {
-      String msg = e.getMessage();
-      if ("Forbidden".equals(msg)) {
-        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not allowed");
-      }
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found");
     }
   }
@@ -83,11 +81,9 @@ public class AccountTransactionController {
 
     try {
       return accountTransactionService.getTransaction(accountNumber, transactionId, username);
+    } catch (com.eaglebank.exception.AccessDeniedException ade) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not allowed");
     } catch (RuntimeException e) {
-      String msg = e.getMessage();
-      if ("Forbidden".equals(msg)) {
-        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not allowed");
-      }
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found");
     }
   }

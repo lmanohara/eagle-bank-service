@@ -1,7 +1,10 @@
 package com.eaglebank.exception;
 
-public class BadRequestException extends RuntimeException {
-  public BadRequestException(String msg) {
-    super(msg);
+import org.springframework.http.HttpStatus;
+
+public class BadRequestException extends ApiException {
+
+  public BadRequestException(String message) {
+    super(HttpStatus.BAD_REQUEST, message);
   }
 }

@@ -6,7 +6,9 @@ import com.eaglebank.dto.UserResponse;
 import com.eaglebank.entity.Address;
 import com.eaglebank.entity.PasswordSetupTokenEntity;
 import com.eaglebank.entity.User;
+import com.eaglebank.exception.AccessDeniedException;
 import com.eaglebank.exception.BadRequestException;
+import com.eaglebank.exception.ResourceNotFoundException;
 import com.eaglebank.repository.PasswordSetupTokenRepository;
 import com.eaglebank.repository.UserRepository;
 import java.time.Duration;
@@ -95,10 +97,11 @@ public class UserService {
   }
 
   public UserResponse getUserById(String id, String authUsername) {
-    User user = repo.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+    User user =
+        repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
     if (user.getUsername() == null || !user.getUsername().equals(authUsername)) {
-      throw new RuntimeException("Forbidden");
+      throw new AccessDeniedException("Forbidden");
     }
 
     return mapToUserResponse(user, null);

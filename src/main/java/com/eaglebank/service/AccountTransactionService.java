@@ -5,6 +5,8 @@ import com.eaglebank.dto.TransactionResponse;
 import com.eaglebank.dto.TransactionsResponse;
 import com.eaglebank.entity.Account;
 import com.eaglebank.entity.AccountTransaction;
+import com.eaglebank.exception.AccessDeniedException;
+import com.eaglebank.exception.ResourceNotFoundException;
 import com.eaglebank.model.TransactionType;
 import com.eaglebank.repository.AccountRepository;
 import com.eaglebank.repository.AccountTransactionRepository;
@@ -30,12 +32,12 @@ public class AccountTransactionService {
     Account account =
         accountRepository
             .findByAccountNumber(accountNumber)
-            .orElseThrow(() -> new RuntimeException("Account not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
 
     if (account.getUser() == null
         || account.getUser().getUsername() == null
         || !account.getUser().getUsername().equals(username)) {
-      throw new RuntimeException("Forbidden");
+      throw new AccessDeniedException("Forbidden");
     }
 
     Account savedAccount = updateAccountBalance(transactionRequest, account);
@@ -63,12 +65,12 @@ public class AccountTransactionService {
     Account account =
         accountRepository
             .findByAccountNumber(accountNumber)
-            .orElseThrow(() -> new RuntimeException("Account not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
 
     if (account.getUser() == null
         || account.getUser().getUsername() == null
         || !account.getUser().getUsername().equals(username)) {
-      throw new RuntimeException("Forbidden");
+      throw new AccessDeniedException("Forbidden");
     }
 
     List<AccountTransaction> transactions = transactionRepository.findByAccount(account);
@@ -149,18 +151,18 @@ public class AccountTransactionService {
     Account account =
         accountRepository
             .findByAccountNumber(accountNumber)
-            .orElseThrow(() -> new RuntimeException("Account not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
 
     if (account.getUser() == null
         || account.getUser().getUsername() == null
         || !account.getUser().getUsername().equals(username)) {
-      throw new RuntimeException("Forbidden");
+      throw new AccessDeniedException("Forbidden");
     }
 
     AccountTransaction transaction =
         transactionRepository
             .findByIdAndAccount(transactionId, account)
-            .orElseThrow(() -> new RuntimeException("Transaction not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Transaction not found"));
 
     String userId =
         transaction.getAccount() != null && transaction.getAccount().getUser() != null
