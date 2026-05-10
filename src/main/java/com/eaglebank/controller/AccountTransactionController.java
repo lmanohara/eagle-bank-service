@@ -24,23 +24,17 @@ public class AccountTransactionController {
 
   private final AccountTransactionService accountTransactionService;
 
-  @PostMapping("/{accountId}/transactions")
+  @PostMapping("/{accountNumber}/transactions")
   public TransactionResponse transact(
-      @PathVariable("accountId") String accountId, @Valid @RequestBody TransactionRequest req) {
+      @PathVariable("accountNumber") String accountNumber,
+      @Valid @RequestBody TransactionRequest req) {
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     if (auth == null || !auth.isAuthenticated() || auth.getName() == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
     }
 
-    Long id;
     try {
-      id = Long.valueOf(accountId);
-    } catch (NumberFormatException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid account id");
-    }
-
-    try {
-      return accountTransactionService.createTransaction(id, auth.getName(), req);
+      return accountTransactionService.createTransaction(accountNumber, auth.getName(), req);
     } catch (RuntimeException e) {
       String msg = e.getMessage();
       if ("Forbidden".equals(msg)) {
@@ -54,22 +48,16 @@ public class AccountTransactionController {
     }
   }
 
-  @GetMapping("/{accountId}/transactions")
-  public TransactionsResponse listTransactions(@PathVariable("accountId") String accountId) {
+  @GetMapping("/{accountNumber}/transactions")
+  public TransactionsResponse listTransactions(
+      @PathVariable("accountNumber") String accountNumber) {
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     if (auth == null || !auth.isAuthenticated() || auth.getName() == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
     }
 
-    Long id;
     try {
-      id = Long.valueOf(accountId);
-    } catch (NumberFormatException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid account id");
-    }
-
-    try {
-      return accountTransactionService.listTransactions(id, auth.getName());
+      return accountTransactionService.listTransactions(accountNumber, auth.getName());
     } catch (RuntimeException e) {
       String msg = e.getMessage();
       if ("Forbidden".equals(msg)) {
@@ -79,31 +67,17 @@ public class AccountTransactionController {
     }
   }
 
-  @GetMapping("/{accountId}/transactions/{transactionId}")
+  @GetMapping("/{accountNumber}/transactions/{transactionId}")
   public TransactionResponse getTransaction(
-      @PathVariable("accountId") String accountId,
+      @PathVariable("accountNumber") String accountNumber,
       @PathVariable("transactionId") String transactionId) {
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     if (auth == null || !auth.isAuthenticated() || auth.getName() == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
     }
 
-    Long accId;
     try {
-      accId = Long.valueOf(accountId);
-    } catch (NumberFormatException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid account id");
-    }
-
-    Long txId;
-    try {
-      txId = Long.valueOf(transactionId);
-    } catch (NumberFormatException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid transaction id");
-    }
-
-    try {
-      return accountTransactionService.getTransaction(accId, txId, auth.getName());
+      return accountTransactionService.getTransaction(accountNumber, transactionId, auth.getName());
     } catch (RuntimeException e) {
       String msg = e.getMessage();
       if ("Forbidden".equals(msg)) {

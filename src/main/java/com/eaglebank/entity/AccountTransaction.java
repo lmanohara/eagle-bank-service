@@ -16,9 +16,8 @@ import lombok.*;
 public class AccountTransaction {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "transaction_id")
-  private Long id;
+  private String id; // format: trn-<uuid>
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "account_id", foreignKey = @ForeignKey(name = "fk_transaction_account"))

@@ -11,6 +11,7 @@ import com.eaglebank.util.AccountNumberGenerator;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ public class AccountService {
     Instant now = Instant.now();
     Account account =
         Account.builder()
+            .id("acc-" + UUID.randomUUID().toString())
             .accountNumber(AccountNumberGenerator.generateAccountNumber())
             .sortCode(AccountNumberGenerator.generateSortCode())
             .name(req.getName())
@@ -72,10 +74,10 @@ public class AccountService {
         .build();
   }
 
-  public AccountResponse getByIdForUser(Long accountId, String username) {
+  public AccountResponse getByAccountNumberForUser(String accountNumber, String username) {
     Account account =
         accountRepository
-            .findById(accountId)
+            .findByAccountNumber(accountNumber)
             .orElseThrow(() -> new RuntimeException("Account not found"));
     if (account.getUser() == null
         || account.getUser().getUsername() == null

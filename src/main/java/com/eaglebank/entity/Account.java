@@ -15,9 +15,8 @@ import lombok.*;
 public class Account {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "account_id")
-  private Long id;
+  private String id; // format: acc-<uuid>
 
   @Column(name = "number", unique = true)
   private String accountNumber;

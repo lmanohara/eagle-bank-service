@@ -46,22 +46,15 @@ public class AccountController {
     return accountService.listForUser(username);
   }
 
-  @GetMapping("/{accountId}")
-  public AccountResponse getOne(@PathVariable("accountId") String accountId) {
+  @GetMapping("/{accountNumber}")
+  public AccountResponse getOne(@PathVariable("accountNumber") String accountNumber) {
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     if (auth == null || !auth.isAuthenticated() || auth.getName() == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
     }
 
-    Long id;
     try {
-      id = Long.valueOf(accountId);
-    } catch (NumberFormatException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid account id");
-    }
-
-    try {
-      return accountService.getByIdForUser(id, auth.getName());
+      return accountService.getByAccountNumberForUser(accountNumber, auth.getName());
     } catch (RuntimeException e) {
       if ("Forbidden".equals(e.getMessage())) {
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not allowed");

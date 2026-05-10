@@ -11,6 +11,7 @@ import com.eaglebank.repository.AccountTransactionRepository;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,10 +26,10 @@ public class AccountTransactionService {
 
   @Transactional
   public TransactionResponse createTransaction(
-      Long accountId, String username, TransactionRequest transactionRequest) {
+      String accountNumber, String username, TransactionRequest transactionRequest) {
     Account account =
         accountRepository
-            .findById(accountId)
+            .findByAccountNumber(accountNumber)
             .orElseThrow(() -> new RuntimeException("Account not found"));
 
     if (account.getUser() == null
@@ -41,13 +42,12 @@ public class AccountTransactionService {
 
     AccountTransaction saved = saveTransaction(transactionRequest, savedAccount);
 
-    // Convert amount to minor units (pence) as a long
     Long amountMinor = null;
     if (saved.getAmount() != null) {
       amountMinor = saved.getAmount().movePointRight(2).longValue();
     }
 
-    String txId = "tan-" + saved.getId();
+    String txId = saved.getId();
     String userId =
         saved.getAccount() != null && saved.getAccount().getUser() != null
             ? saved.getAccount().getUser().getId()
@@ -64,10 +64,10 @@ public class AccountTransactionService {
         .build();
   }
 
-  public TransactionsResponse listTransactions(Long accountId, String username) {
+  public TransactionsResponse listTransactions(String accountNumber, String username) {
     Account account =
         accountRepository
-            .findById(accountId)
+            .findByAccountNumber(accountNumber)
             .orElseThrow(() -> new RuntimeException("Account not found"));
 
     if (account.getUser() == null
@@ -86,7 +86,7 @@ public class AccountTransactionService {
                   if (saved.getAmount() != null) {
                     amountMinor = saved.getAmount().movePointRight(2).longValue();
                   }
-                  String txId = "tan-" + saved.getId();
+                  String txId = saved.getId();
                   String userId =
                       saved.getAccount() != null && saved.getAccount().getUser() != null
                           ? saved.getAccount().getUser().getId()
@@ -110,6 +110,7 @@ public class AccountTransactionService {
       TransactionRequest transactionRequest, Account savedAccount) {
     AccountTransaction transaction =
         AccountTransaction.builder()
+            .id("trn-" + UUID.randomUUID().toString())
             .account(savedAccount)
             .amount(transactionRequest.getAmount())
             .currency(transactionRequest.getCurrency())
@@ -150,10 +151,11 @@ public class AccountTransactionService {
     return accountRepository.save(account);
   }
 
-  public TransactionResponse getTransaction(Long accountId, Long transactionId, String username) {
+  public TransactionResponse getTransaction(
+      String accountNumber, String transactionId, String username) {
     Account account =
         accountRepository
-            .findById(accountId)
+            .findByAccountNumber(accountNumber)
             .orElseThrow(() -> new RuntimeException("Account not found"));
 
     if (account.getUser() == null
@@ -172,7 +174,7 @@ public class AccountTransactionService {
       amountMinor = transaction.getAmount().movePointRight(2).longValue();
     }
 
-    String txId = "tan-" + transaction.getId();
+    String txId = transaction.getId();
     String userId =
         transaction.getAccount() != null && transaction.getAccount().getUser() != null
             ? transaction.getAccount().getUser().getId()
