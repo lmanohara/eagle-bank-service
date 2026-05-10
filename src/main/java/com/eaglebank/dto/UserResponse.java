@@ -1,6 +1,8 @@
 package com.eaglebank.dto;
 
 import java.time.Instant;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,5 +20,7 @@ public class UserResponse {
   private String email;
   private Instant createdTimestamp;
   private Instant updatedTimestamp;
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private String passwordSetupToken;
 }

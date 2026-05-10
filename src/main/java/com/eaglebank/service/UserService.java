@@ -93,6 +93,11 @@ public class UserService {
         .build();
   }
 
+  public UserResponse getUserById(Long id) {
+    User user = repo.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+    return mapToUserResponse(user, null);
+  }
+
   // TODO: 09/05/2026 this should move to separate service
   private String generatePasswordSetupToken(User user) {
     String token = UUID.randomUUID().toString();
