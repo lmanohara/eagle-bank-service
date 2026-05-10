@@ -96,7 +96,7 @@ public class UserService {
   // TODO: 09/05/2026 this should move to separate service
   private String generatePasswordSetupToken(User user) {
     String token = UUID.randomUUID().toString();
-    PasswordSetupTokenEntity entity =
+    PasswordSetupTokenEntity passwordSetupTokenEntity =
         PasswordSetupTokenEntity.builder()
             .user(user)
             .tokenHash(token)
@@ -104,7 +104,7 @@ public class UserService {
             .used(false)
             .build();
 
-    tokenRepo.save(entity);
+    tokenRepo.save(passwordSetupTokenEntity);
     return token;
   }
 }
