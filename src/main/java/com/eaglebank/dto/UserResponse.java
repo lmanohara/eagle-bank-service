@@ -1,8 +1,7 @@
 package com.eaglebank.dto;
 
-import java.time.Instant;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
