@@ -29,7 +29,7 @@ public class AccountService {
     User user =
         userRepository
             .findByUsername(username)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
     Instant now = Instant.now();
     Account account =
@@ -55,7 +55,7 @@ public class AccountService {
     User user =
         userRepository
             .findByUsername(username)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     List<Account> accounts = accountRepository.findByUser(user);
     List<AccountResponse> responses =
         accounts.stream().map(this::toResponse).collect(Collectors.toList());

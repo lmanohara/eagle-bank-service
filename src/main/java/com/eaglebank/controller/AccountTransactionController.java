@@ -29,24 +29,9 @@ public class AccountTransactionController {
       @Valid @RequestBody TransactionRequest req,
       @AuthenticationPrincipal String authUsername) {
     if (authUsername == null) {
-      throw new org.springframework.web.server.ResponseStatusException(
-          org.springframework.http.HttpStatus.UNAUTHORIZED, "Not authenticated");
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
     }
-    String username = authUsername;
-
-    try {
-      return accountTransactionService.createTransaction(accountNumber, username, req);
-    } catch (com.eaglebank.exception.AccessDeniedException ade) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not allowed");
-    } catch (RuntimeException e) {
-      String msg = e.getMessage();
-      if ("Insufficient funds".equals(msg)) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Insufficient funds");
-      } else if ("Invalid amount".equals(msg) || "Invalid transaction type".equals(msg)) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, msg);
-      }
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found");
-    }
+    return accountTransactionService.createTransaction(accountNumber, authUsername, req);
   }
 
   @GetMapping("/{accountNumber}/transactions")
@@ -54,18 +39,9 @@ public class AccountTransactionController {
       @PathVariable("accountNumber") String accountNumber,
       @AuthenticationPrincipal String authUsername) {
     if (authUsername == null) {
-      throw new org.springframework.web.server.ResponseStatusException(
-          org.springframework.http.HttpStatus.UNAUTHORIZED, "Not authenticated");
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
     }
-    String username = authUsername;
-
-    try {
-      return accountTransactionService.listTransactions(accountNumber, username);
-    } catch (com.eaglebank.exception.AccessDeniedException ade) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not allowed");
-    } catch (RuntimeException e) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found");
-    }
+    return accountTransactionService.listTransactions(accountNumber, authUsername);
   }
 
   @GetMapping("/{accountNumber}/transactions/{transactionId}")
@@ -74,17 +50,8 @@ public class AccountTransactionController {
       @PathVariable("transactionId") String transactionId,
       @AuthenticationPrincipal String authUsername) {
     if (authUsername == null) {
-      throw new org.springframework.web.server.ResponseStatusException(
-          org.springframework.http.HttpStatus.UNAUTHORIZED, "Not authenticated");
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
     }
-    String username = authUsername;
-
-    try {
-      return accountTransactionService.getTransaction(accountNumber, transactionId, username);
-    } catch (com.eaglebank.exception.AccessDeniedException ade) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not allowed");
-    } catch (RuntimeException e) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found");
-    }
+    return accountTransactionService.getTransaction(accountNumber, transactionId, authUsername);
   }
 }
