@@ -1,5 +1,6 @@
 package com.eaglebank.dto;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +16,7 @@ public class AccountResponse {
   private String sortCode;
   private String name;
   private String accountType;
-  private Long balance;
+  private BigDecimal balance;
   private String currency;
   private Instant createdTimestamp;
   private Instant updatedTimestamp;

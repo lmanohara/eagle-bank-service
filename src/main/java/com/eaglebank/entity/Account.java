@@ -1,6 +1,7 @@
 package com.eaglebank.entity;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.Instant;
 import lombok.*;
 
@@ -31,7 +32,7 @@ public class Account {
   private String accountType;
 
   @Column(name = "balance")
-  private Long balance;
+  private BigDecimal balance;
 
   @Column(name = "currency")
   private String currency;

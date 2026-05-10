@@ -8,6 +8,7 @@ import com.eaglebank.entity.User;
 import com.eaglebank.repository.AccountRepository;
 import com.eaglebank.repository.UserRepository;
 import com.eaglebank.util.AccountNumberGenerator;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,7 +35,7 @@ public class AccountService {
             .sortCode(AccountNumberGenerator.generateSortCode())
             .name(req.getName())
             .accountType(req.getAccountType())
-            .balance(0L)
+            .balance(BigDecimal.ZERO)
             .currency("GBP")
             .createdTimestamp(now)
             .updatedTimestamp(now)
