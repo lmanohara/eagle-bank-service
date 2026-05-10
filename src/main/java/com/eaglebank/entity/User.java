@@ -13,9 +13,8 @@ import lombok.*;
 @Builder
 public class User {
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "user_id")
-  private Long id;
+  private String id; // format: usr-<uuid>
 
   @Column(name = "username", unique = true)
   private String username;

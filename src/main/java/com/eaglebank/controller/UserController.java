@@ -5,9 +5,7 @@ import com.eaglebank.dto.UserResponse;
 import com.eaglebank.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/v1/users")
@@ -23,11 +21,6 @@ public class UserController {
 
   @GetMapping("/{userId}")
   public UserResponse getUser(@PathVariable("userId") String userId) {
-    try {
-      Long id = Long.valueOf(userId);
-      return service.getUserById(id);
-    } catch (NumberFormatException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid user id");
-    }
+    return service.getUserById(userId);
   }
 }

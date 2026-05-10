@@ -10,6 +10,7 @@ import com.eaglebank.entity.User;
 import com.eaglebank.repository.PasswordSetupTokenRepository;
 import com.eaglebank.repository.UserRepository;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -44,7 +45,7 @@ public class UserServiceTest {
         .thenAnswer(
             invocation -> {
               User u = invocation.getArgument(0);
-              u.setId(1L);
+              u.setId("usr-" + UUID.randomUUID());
               return u;
             });
 

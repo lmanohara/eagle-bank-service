@@ -50,7 +50,7 @@ public class AccountTransactionService {
     String txId = "tan-" + saved.getId();
     String userId =
         saved.getAccount() != null && saved.getAccount().getUser() != null
-            ? "usr-" + saved.getAccount().getUser().getId()
+            ? saved.getAccount().getUser().getId()
             : null;
 
     return TransactionResponse.builder()
@@ -89,7 +89,7 @@ public class AccountTransactionService {
                   String txId = "tan-" + saved.getId();
                   String userId =
                       saved.getAccount() != null && saved.getAccount().getUser() != null
-                          ? "usr-" + saved.getAccount().getUser().getId()
+                          ? saved.getAccount().getUser().getId()
                           : null;
                   return TransactionResponse.builder()
                       .id(txId)
@@ -175,7 +175,7 @@ public class AccountTransactionService {
     String txId = "tan-" + transaction.getId();
     String userId =
         transaction.getAccount() != null && transaction.getAccount().getUser() != null
-            ? "usr-" + transaction.getAccount().getUser().getId()
+            ? transaction.getAccount().getUser().getId()
             : null;
 
     return TransactionResponse.builder()

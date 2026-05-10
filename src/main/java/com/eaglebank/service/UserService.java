@@ -55,6 +55,7 @@ public class UserService {
 
     User user =
         User.builder()
+            .id("usr-" + UUID.randomUUID())
             .name(req.getName())
             .email(req.getEmail())
             .phoneNumber(req.getPhoneNumber())
@@ -82,7 +83,7 @@ public class UserService {
     }
 
     return UserResponse.builder()
-        .id(user.getId() == null ? null : user.getId().toString())
+        .id(user.getId())
         .name(user.getName())
         .address(address)
         .phoneNumber(user.getPhoneNumber())
@@ -93,7 +94,7 @@ public class UserService {
         .build();
   }
 
-  public UserResponse getUserById(Long id) {
+  public UserResponse getUserById(String id) {
     User user = repo.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
     return mapToUserResponse(user, null);
   }
