@@ -6,7 +6,6 @@ import com.eaglebank.dto.TransactionsResponse;
 import com.eaglebank.service.AccountTransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/v1/accounts")
@@ -28,9 +26,6 @@ public class AccountTransactionController {
       @PathVariable("accountNumber") String accountNumber,
       @Valid @RequestBody TransactionRequest req,
       @AuthenticationPrincipal String authUsername) {
-    if (authUsername == null) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
-    }
     return accountTransactionService.createTransaction(accountNumber, authUsername, req);
   }
 
@@ -38,9 +33,6 @@ public class AccountTransactionController {
   public TransactionsResponse listTransactions(
       @PathVariable("accountNumber") String accountNumber,
       @AuthenticationPrincipal String authUsername) {
-    if (authUsername == null) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
-    }
     return accountTransactionService.listTransactions(accountNumber, authUsername);
   }
 
@@ -49,9 +41,6 @@ public class AccountTransactionController {
       @PathVariable("accountNumber") String accountNumber,
       @PathVariable("transactionId") String transactionId,
       @AuthenticationPrincipal String authUsername) {
-    if (authUsername == null) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
-    }
     return accountTransactionService.getTransaction(accountNumber, transactionId, authUsername);
   }
 }
