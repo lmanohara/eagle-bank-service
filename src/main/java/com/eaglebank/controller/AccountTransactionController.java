@@ -4,11 +4,10 @@ import com.eaglebank.dto.TransactionRequest;
 import com.eaglebank.dto.TransactionResponse;
 import com.eaglebank.dto.TransactionsResponse;
 import com.eaglebank.service.AccountTransactionService;
+import com.eaglebank.util.AuthUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,13 +27,10 @@ public class AccountTransactionController {
   public TransactionResponse transact(
       @PathVariable("accountNumber") String accountNumber,
       @Valid @RequestBody TransactionRequest req) {
-    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    if (auth == null || !auth.isAuthenticated() || auth.getName() == null) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
-    }
+    String username = AuthUtils.requireAuthenticatedUsername();
 
     try {
-      return accountTransactionService.createTransaction(accountNumber, auth.getName(), req);
+      return accountTransactionService.createTransaction(accountNumber, username, req);
     } catch (RuntimeException e) {
       String msg = e.getMessage();
       if ("Forbidden".equals(msg)) {
@@ -51,13 +47,10 @@ public class AccountTransactionController {
   @GetMapping("/{accountNumber}/transactions")
   public TransactionsResponse listTransactions(
       @PathVariable("accountNumber") String accountNumber) {
-    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    if (auth == null || !auth.isAuthenticated() || auth.getName() == null) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
-    }
+    String username = AuthUtils.requireAuthenticatedUsername();
 
     try {
-      return accountTransactionService.listTransactions(accountNumber, auth.getName());
+      return accountTransactionService.listTransactions(accountNumber, username);
     } catch (RuntimeException e) {
       String msg = e.getMessage();
       if ("Forbidden".equals(msg)) {
@@ -71,13 +64,10 @@ public class AccountTransactionController {
   public TransactionResponse getTransaction(
       @PathVariable("accountNumber") String accountNumber,
       @PathVariable("transactionId") String transactionId) {
-    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    if (auth == null || !auth.isAuthenticated() || auth.getName() == null) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
-    }
+    String username = AuthUtils.requireAuthenticatedUsername();
 
     try {
-      return accountTransactionService.getTransaction(accountNumber, transactionId, auth.getName());
+      return accountTransactionService.getTransaction(accountNumber, transactionId, username);
     } catch (RuntimeException e) {
       String msg = e.getMessage();
       if ("Forbidden".equals(msg)) {

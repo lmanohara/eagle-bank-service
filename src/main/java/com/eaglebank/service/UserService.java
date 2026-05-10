@@ -22,16 +22,16 @@ public class UserService {
   private final UserRepository repo;
   private final PasswordSetupTokenRepository tokenRepo;
 
-  public UserResponse createUser(UserRequest req) {
-    if (req.getEmail() == null) {
+  public UserResponse createUser(UserRequest userRequest) {
+    if (userRequest.getEmail() == null) {
       throw new BadRequestException("Email is required");
     }
 
-    if (repo.findByEmail(req.getEmail()).isPresent()) {
+    if (repo.findByEmail(userRequest.getEmail()).isPresent()) {
       throw new BadRequestException("Email exists");
     }
 
-    User user = saveUser(req);
+    User user = saveUser(userRequest);
 
     String token = generatePasswordSetupToken(user);
 

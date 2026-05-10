@@ -15,8 +15,8 @@ public class UserController {
   private final UserService service;
 
   @PostMapping
-  public UserResponse create(@Valid @RequestBody UserRequest req) {
-    return service.createUser(req);
+  public UserResponse create(@Valid @RequestBody UserRequest userRequest) {
+    return service.createUser(userRequest);
   }
 
   @GetMapping("/{userId}")
