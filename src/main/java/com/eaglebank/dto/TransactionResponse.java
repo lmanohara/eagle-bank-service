@@ -1,6 +1,7 @@
 package com.eaglebank.dto;
 
 import com.eaglebank.model.TransactionType;
+import java.math.BigDecimal;
 import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +16,7 @@ import lombok.Setter;
 @Builder
 public class TransactionResponse {
   private String id; // e.g., "tan-123abc"
-  private Long amount; // amount in minor units (pence)
+  private BigDecimal amount; // amount in minor units (pence)
   private String currency;
   private TransactionType type;
   private String reference;

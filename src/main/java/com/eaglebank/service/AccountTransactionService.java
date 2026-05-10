@@ -40,27 +40,22 @@ public class AccountTransactionService {
 
     Account savedAccount = updateAccountBalance(transactionRequest, account);
 
-    AccountTransaction saved = saveTransaction(transactionRequest, savedAccount);
+    AccountTransaction savedTransaction = saveTransaction(transactionRequest, savedAccount);
 
-    Long amountMinor = null;
-    if (saved.getAmount() != null) {
-      amountMinor = saved.getAmount().movePointRight(2).longValue();
-    }
-
-    String txId = saved.getId();
+    String txId = savedTransaction.getId();
     String userId =
-        saved.getAccount() != null && saved.getAccount().getUser() != null
-            ? saved.getAccount().getUser().getId()
+        savedTransaction.getAccount() != null && savedTransaction.getAccount().getUser() != null
+            ? savedTransaction.getAccount().getUser().getId()
             : null;
 
     return TransactionResponse.builder()
         .id(txId)
-        .amount(amountMinor)
-        .currency(saved.getCurrency())
-        .type(saved.getType())
-        .reference(saved.getReference())
+        .amount(savedTransaction.getAmount())
+        .currency(savedTransaction.getCurrency())
+        .type(savedTransaction.getType())
+        .reference(savedTransaction.getReference())
         .userId(userId)
-        .createdTimestamp(saved.getCreatedTimestamp())
+        .createdTimestamp(savedTransaction.getCreatedTimestamp())
         .build();
   }
 
@@ -81,24 +76,20 @@ public class AccountTransactionService {
     List<TransactionResponse> responses =
         transactions.stream()
             .map(
-                saved -> {
-                  Long amountMinor = null;
-                  if (saved.getAmount() != null) {
-                    amountMinor = saved.getAmount().movePointRight(2).longValue();
-                  }
-                  String txId = saved.getId();
+                transaction -> {
+                  String txId = transaction.getId();
                   String userId =
-                      saved.getAccount() != null && saved.getAccount().getUser() != null
-                          ? saved.getAccount().getUser().getId()
+                      transaction.getAccount() != null && transaction.getAccount().getUser() != null
+                          ? transaction.getAccount().getUser().getId()
                           : null;
                   return TransactionResponse.builder()
                       .id(txId)
-                      .amount(amountMinor)
-                      .currency(saved.getCurrency())
-                      .type(saved.getType())
-                      .reference(saved.getReference())
+                      .amount(transaction.getAmount())
+                      .currency(transaction.getCurrency())
+                      .type(transaction.getType())
+                      .reference(transaction.getReference())
                       .userId(userId)
-                      .createdTimestamp(saved.getCreatedTimestamp())
+                      .createdTimestamp(transaction.getCreatedTimestamp())
                       .build();
                 })
             .collect(Collectors.toList());
@@ -110,7 +101,7 @@ public class AccountTransactionService {
       TransactionRequest transactionRequest, Account savedAccount) {
     AccountTransaction transaction =
         AccountTransaction.builder()
-            .id("trn-" + UUID.randomUUID().toString())
+            .id("trn-" + UUID.randomUUID())
             .account(savedAccount)
             .amount(transactionRequest.getAmount())
             .currency(transactionRequest.getCurrency())
@@ -123,24 +114,26 @@ public class AccountTransactionService {
     return transactionRepository.save(transaction);
   }
 
-  private Account updateAccountBalance(TransactionRequest req, Account account) {
-    if (req.getAmount() == null || req.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+  private Account updateAccountBalance(TransactionRequest transactionRequest, Account account) {
+    if (transactionRequest.getAmount() == null
+        || transactionRequest.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
       throw new RuntimeException("Invalid amount");
     }
 
     BigDecimal newBalance;
-    TransactionType type = req.getType();
+    TransactionType type = transactionRequest.getType();
+
     if (type == TransactionType.DEPOSIT) {
       newBalance =
           account.getBalance() == null
-              ? req.getAmount()
-              : account.getBalance().add(req.getAmount());
+              ? transactionRequest.getAmount()
+              : account.getBalance().add(transactionRequest.getAmount());
     } else if (type == TransactionType.WITHDRAW) {
       BigDecimal current = account.getBalance() == null ? BigDecimal.ZERO : account.getBalance();
-      if (current.compareTo(req.getAmount()) < 0) {
+      if (current.compareTo(transactionRequest.getAmount()) < 0) {
         throw new RuntimeException("Insufficient funds");
       }
-      newBalance = current.subtract(req.getAmount());
+      newBalance = current.subtract(transactionRequest.getAmount());
     } else {
       throw new RuntimeException("Invalid transaction type");
     }
@@ -169,20 +162,14 @@ public class AccountTransactionService {
             .findByIdAndAccount(transactionId, account)
             .orElseThrow(() -> new RuntimeException("Transaction not found"));
 
-    Long amountMinor = null;
-    if (transaction.getAmount() != null) {
-      amountMinor = transaction.getAmount().movePointRight(2).longValue();
-    }
-
-    String txId = transaction.getId();
     String userId =
         transaction.getAccount() != null && transaction.getAccount().getUser() != null
             ? transaction.getAccount().getUser().getId()
             : null;
 
     return TransactionResponse.builder()
-        .id(txId)
-        .amount(amountMinor)
+        .id(transaction.getId())
+        .amount(transaction.getAmount())
         .currency(transaction.getCurrency())
         .type(transaction.getType())
         .reference(transaction.getReference())

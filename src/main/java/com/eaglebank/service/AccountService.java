@@ -32,7 +32,7 @@ public class AccountService {
     Instant now = Instant.now();
     Account account =
         Account.builder()
-            .id("acc-" + UUID.randomUUID().toString())
+            .id("acc-" + UUID.randomUUID())
             .accountNumber(AccountNumberGenerator.generateAccountNumber())
             .sortCode(AccountNumberGenerator.generateSortCode())
             .name(req.getName())
