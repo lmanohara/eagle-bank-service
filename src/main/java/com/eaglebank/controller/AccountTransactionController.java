@@ -2,12 +2,14 @@ package com.eaglebank.controller;
 
 import com.eaglebank.dto.TransactionRequest;
 import com.eaglebank.dto.TransactionResponse;
+import com.eaglebank.dto.TransactionsResponse;
 import com.eaglebank.service.AccountTransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -47,6 +49,31 @@ public class AccountTransactionController {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Insufficient funds");
       } else if ("Invalid amount".equals(msg) || "Invalid transaction type".equals(msg)) {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, msg);
+      }
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found");
+    }
+  }
+
+  @GetMapping("/{accountId}/transactions")
+  public TransactionsResponse listTransactions(@PathVariable("accountId") String accountId) {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    if (auth == null || !auth.isAuthenticated() || auth.getName() == null) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
+    }
+
+    Long id;
+    try {
+      id = Long.valueOf(accountId);
+    } catch (NumberFormatException e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid account id");
+    }
+
+    try {
+      return accountTransactionService.listTransactions(id, auth.getName());
+    } catch (RuntimeException e) {
+      String msg = e.getMessage();
+      if ("Forbidden".equals(msg)) {
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not allowed");
       }
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found");
     }

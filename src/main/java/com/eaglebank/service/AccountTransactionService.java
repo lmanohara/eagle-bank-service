@@ -2,6 +2,7 @@ package com.eaglebank.service;
 
 import com.eaglebank.dto.TransactionRequest;
 import com.eaglebank.dto.TransactionResponse;
+import com.eaglebank.dto.TransactionsResponse;
 import com.eaglebank.entity.Account;
 import com.eaglebank.entity.AccountTransaction;
 import com.eaglebank.model.TransactionType;
@@ -9,6 +10,8 @@ import com.eaglebank.repository.AccountRepository;
 import com.eaglebank.repository.AccountTransactionRepository;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,7 +64,50 @@ public class AccountTransactionService {
         .build();
   }
 
-  private AccountTransaction saveTransaction(TransactionRequest transactionRequest, Account savedAccount) {
+  public TransactionsResponse listTransactions(Long accountId, String username) {
+    Account account =
+        accountRepository
+            .findById(accountId)
+            .orElseThrow(() -> new RuntimeException("Account not found"));
+
+    if (account.getUser() == null
+        || account.getUser().getUsername() == null
+        || !account.getUser().getUsername().equals(username)) {
+      throw new RuntimeException("Forbidden");
+    }
+
+    List<AccountTransaction> transactions = transactionRepository.findByAccount(account);
+
+    List<TransactionResponse> responses =
+        transactions.stream()
+            .map(
+                saved -> {
+                  Long amountMinor = null;
+                  if (saved.getAmount() != null) {
+                    amountMinor = saved.getAmount().movePointRight(2).longValue();
+                  }
+                  String txId = "tan-" + saved.getId();
+                  String userId =
+                      saved.getAccount() != null && saved.getAccount().getUser() != null
+                          ? "usr-" + saved.getAccount().getUser().getId()
+                          : null;
+                  return TransactionResponse.builder()
+                      .id(txId)
+                      .amount(amountMinor)
+                      .currency(saved.getCurrency())
+                      .type(saved.getType())
+                      .reference(saved.getReference())
+                      .userId(userId)
+                      .createdTimestamp(saved.getCreatedTimestamp())
+                      .build();
+                })
+            .collect(Collectors.toList());
+
+    return TransactionsResponse.builder().transactions(responses).build();
+  }
+
+  private AccountTransaction saveTransaction(
+      TransactionRequest transactionRequest, Account savedAccount) {
     AccountTransaction transaction =
         AccountTransaction.builder()
             .account(savedAccount)
