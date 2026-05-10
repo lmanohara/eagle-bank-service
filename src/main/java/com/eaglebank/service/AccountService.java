@@ -71,4 +71,18 @@ public class AccountService {
         .updatedTimestamp(saved.getUpdatedTimestamp())
         .build();
   }
+
+  public AccountResponse getByIdForUser(Long accountId, String username) {
+    Account account =
+        accountRepository
+            .findById(accountId)
+            .orElseThrow(() -> new RuntimeException("Account not found"));
+    if (account.getUser() == null
+        || account.getUser().getUsername() == null
+        || !account.getUser().getUsername().equals(username)) {
+      throw new RuntimeException("Forbidden");
+    }
+
+    return toResponse(account);
+  }
 }
