@@ -149,4 +149,43 @@ public class AccountTransactionService {
 
     return accountRepository.save(account);
   }
+
+  public TransactionResponse getTransaction(Long accountId, Long transactionId, String username) {
+    Account account =
+        accountRepository
+            .findById(accountId)
+            .orElseThrow(() -> new RuntimeException("Account not found"));
+
+    if (account.getUser() == null
+        || account.getUser().getUsername() == null
+        || !account.getUser().getUsername().equals(username)) {
+      throw new RuntimeException("Forbidden");
+    }
+
+    AccountTransaction transaction =
+        transactionRepository
+            .findByIdAndAccount(transactionId, account)
+            .orElseThrow(() -> new RuntimeException("Transaction not found"));
+
+    Long amountMinor = null;
+    if (transaction.getAmount() != null) {
+      amountMinor = transaction.getAmount().movePointRight(2).longValue();
+    }
+
+    String txId = "tan-" + transaction.getId();
+    String userId =
+        transaction.getAccount() != null && transaction.getAccount().getUser() != null
+            ? "usr-" + transaction.getAccount().getUser().getId()
+            : null;
+
+    return TransactionResponse.builder()
+        .id(txId)
+        .amount(amountMinor)
+        .currency(transaction.getCurrency())
+        .type(transaction.getType())
+        .reference(transaction.getReference())
+        .userId(userId)
+        .createdTimestamp(transaction.getCreatedTimestamp())
+        .build();
+  }
 }

@@ -78,4 +78,38 @@ public class AccountTransactionController {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found");
     }
   }
+
+  @GetMapping("/{accountId}/transactions/{transactionId}")
+  public TransactionResponse getTransaction(
+      @PathVariable("accountId") String accountId,
+      @PathVariable("transactionId") String transactionId) {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    if (auth == null || !auth.isAuthenticated() || auth.getName() == null) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
+    }
+
+    Long accId;
+    try {
+      accId = Long.valueOf(accountId);
+    } catch (NumberFormatException e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid account id");
+    }
+
+    Long txId;
+    try {
+      txId = Long.valueOf(transactionId);
+    } catch (NumberFormatException e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid transaction id");
+    }
+
+    try {
+      return accountTransactionService.getTransaction(accId, txId, auth.getName());
+    } catch (RuntimeException e) {
+      String msg = e.getMessage();
+      if ("Forbidden".equals(msg)) {
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not allowed");
+      }
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found");
+    }
+  }
 }
