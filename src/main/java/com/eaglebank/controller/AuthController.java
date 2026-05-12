@@ -5,6 +5,7 @@ import com.eaglebank.dto.MessageResponse;
 import com.eaglebank.dto.SetPasswordRequest;
 import com.eaglebank.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -19,13 +20,14 @@ public class AuthController {
   private final AuthService authService;
 
   @PostMapping("/token")
-  public AuthResponse token(
+  public ResponseEntity<AuthResponse> token(
       @RequestHeader(value = "Authorization", required = false) String authorization) {
-    return new AuthResponse(authService.authenticateBasic(authorization));
+    return ResponseEntity.ok(
+        AuthResponse.builder().token(authService.authenticateBasic(authorization)).build());
   }
 
   @PostMapping("/set-password")
-  public MessageResponse setPassword(@RequestBody SetPasswordRequest request) {
-    return authService.setPassword(request);
+  public ResponseEntity<MessageResponse> setPassword(@RequestBody SetPasswordRequest request) {
+    return ResponseEntity.ok(authService.setPassword(request));
   }
 }

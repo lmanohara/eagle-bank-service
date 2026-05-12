@@ -6,6 +6,7 @@ import com.eaglebank.dto.AccountsResponse;
 import com.eaglebank.service.AccountService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,18 +23,20 @@ public class AccountController {
   private final AccountService accountService;
 
   @PostMapping
-  public AccountResponse create(
+  public ResponseEntity<AccountResponse> create(
       @Valid @RequestBody AccountRequest req, @AuthenticationPrincipal String authUsername) {
-    return accountService.createForUser(authUsername, req);
+    return ResponseEntity.ok(accountService.createForUser(authUsername, req));
   }
 
   @GetMapping
-  public AccountsResponse listForUser(@AuthenticationPrincipal String authUsername) {
-    return accountService.listForUser(authUsername);
+  public ResponseEntity<AccountsResponse> listForUser(
+      @AuthenticationPrincipal String authUsername) {
+    return ResponseEntity.ok(accountService.listForUser(authUsername));
   }
 
   @GetMapping("/{accountNumber}")
-  public AccountResponse getOne(@PathVariable("accountNumber") String accountNumber) {
-    return accountService.getByAccountNumberForUser(accountNumber);
+  public ResponseEntity<AccountResponse> getOne(
+      @PathVariable("accountNumber") String accountNumber) {
+    return ResponseEntity.ok(accountService.getByAccountNumberForUser(accountNumber));
   }
 }

@@ -5,6 +5,7 @@ import com.eaglebank.dto.UserResponse;
 import com.eaglebank.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,12 +21,12 @@ public class UserController {
   private final UserService service;
 
   @PostMapping
-  public UserResponse create(@Valid @RequestBody UserRequest userRequest) {
-    return service.createUser(userRequest);
+  public ResponseEntity<UserResponse> create(@Valid @RequestBody UserRequest userRequest) {
+    return ResponseEntity.ok(service.createUser(userRequest));
   }
 
   @GetMapping("/{userId}")
-  public UserResponse getUser(@PathVariable("userId") String userId) {
-    return service.getUserById(userId);
+  public ResponseEntity<UserResponse> getUser(@PathVariable("userId") String userId) {
+    return ResponseEntity.ok(service.getUserById(userId));
   }
 }
