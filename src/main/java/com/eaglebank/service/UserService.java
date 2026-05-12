@@ -6,7 +6,6 @@ import com.eaglebank.dto.UserResponse;
 import com.eaglebank.entity.Address;
 import com.eaglebank.entity.PasswordSetupTokenEntity;
 import com.eaglebank.entity.User;
-import com.eaglebank.exception.AccessDeniedException;
 import com.eaglebank.exception.BadRequestException;
 import com.eaglebank.exception.ResourceNotFoundException;
 import com.eaglebank.repository.PasswordSetupTokenRepository;
@@ -15,6 +14,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -96,14 +96,10 @@ public class UserService {
         .build();
   }
 
-  public UserResponse getUserById(String id, String authUsername) {
+  @PreAuthorize("@authChecker.canAccessUser(#id, authentication.name)")
+  public UserResponse getUserById(String id) {
     User user =
         repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
-
-    if (user.getUsername() == null || !user.getUsername().equals(authUsername)) {
-      throw new AccessDeniedException("Forbidden");
-    }
-
     return mapToUserResponse(user, null);
   }
 

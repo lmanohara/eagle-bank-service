@@ -5,7 +5,6 @@ import com.eaglebank.dto.AccountResponse;
 import com.eaglebank.dto.AccountsResponse;
 import com.eaglebank.entity.Account;
 import com.eaglebank.entity.User;
-import com.eaglebank.exception.AccessDeniedException;
 import com.eaglebank.exception.ResourceNotFoundException;
 import com.eaglebank.repository.AccountRepository;
 import com.eaglebank.repository.UserRepository;
@@ -16,6 +15,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -76,17 +76,12 @@ public class AccountService {
         .build();
   }
 
-  public AccountResponse getByAccountNumberForUser(String accountNumber, String username) {
+  @PreAuthorize("@authChecker.canAccessAccount(#accountNumber, authentication.name)")
+  public AccountResponse getByAccountNumberForUser(String accountNumber) {
     Account account =
         accountRepository
             .findByAccountNumber(accountNumber)
             .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
-    if (account.getUser() == null
-        || account.getUser().getUsername() == null
-        || !account.getUser().getUsername().equals(username)) {
-      throw new AccessDeniedException("Forbidden");
-    }
-
     return toResponse(account);
   }
 }

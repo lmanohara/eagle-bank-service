@@ -64,7 +64,7 @@ public class AccountTransactionServiceTest {
             .reference("ref")
             .build();
 
-    TransactionResponse resp = service.createTransaction("00000001", "alice", req);
+    TransactionResponse resp = service.createTransaction("00000001", req);
 
     assertThat(resp).isNotNull();
     assertThat(resp.getId()).isEqualTo(savedTx.getId());
@@ -94,7 +94,7 @@ public class AccountTransactionServiceTest {
             .reference("r")
             .build();
 
-    assertThatThrownBy(() -> service.createTransaction("00000002", "alice", req))
+    assertThatThrownBy(() -> service.createTransaction("00000002", req))
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("Insufficient funds");
   }
@@ -118,7 +118,7 @@ public class AccountTransactionServiceTest {
     Mockito.when(transactionRepository.findByIdAndAccount("trn-1", acc))
         .thenReturn(Optional.of(tx));
 
-    TransactionResponse resp = service.getTransaction("00000003", "trn-1", "alice");
+    TransactionResponse resp = service.getTransaction("00000003", "trn-1");
 
     assertThat(resp).isNotNull();
     assertThat(resp.getId()).isEqualTo("trn-1");

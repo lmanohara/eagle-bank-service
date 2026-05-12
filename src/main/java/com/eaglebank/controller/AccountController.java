@@ -33,9 +33,7 @@ public class AccountController {
   }
 
   @GetMapping("/{accountNumber}")
-  public AccountResponse getOne(
-      @PathVariable("accountNumber") String accountNumber,
-      @AuthenticationPrincipal String authUsername) {
-    return accountService.getByAccountNumberForUser(accountNumber, authUsername);
+  public AccountResponse getOne(@PathVariable("accountNumber") String accountNumber) {
+    return accountService.getByAccountNumberForUser(accountNumber);
   }
 }

@@ -5,6 +5,7 @@ import com.eaglebank.dto.ValidationError;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -18,6 +19,12 @@ public class GlobalExceptionHandler {
     ErrorResponse errorResponse = ErrorResponse.builder().message(exception.getMessage()).build();
 
     return ResponseEntity.status(exception.getStatus()).body(errorResponse);
+  }
+
+  @ExceptionHandler(AccessDeniedException.class)
+  public ResponseEntity<ErrorResponse> accessDenied(AccessDeniedException exception) {
+    ErrorResponse errorResponse = ErrorResponse.builder().message("Forbidden").build();
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
   }
 
   @ExceptionHandler(BadCredentialsException.class)

@@ -42,16 +42,4 @@ public class AccountServiceTest {
     assertThat(resp.getName()).isEqualTo("Personal");
     assertThat(resp.getAccountType()).isEqualTo("personal");
   }
-
-  @Test
-  void getByAccountNumberForUser_forbidden() {
-    User owner = User.builder().id("usr-1").username("owner").build();
-    Account acc = Account.builder().id("acc-1").accountNumber("00000001").user(owner).build();
-
-    Mockito.when(accountRepository.findByAccountNumber("00000001")).thenReturn(Optional.of(acc));
-
-    assertThatThrownBy(() -> accountService.getByAccountNumberForUser("00000001", "alice"))
-        .isInstanceOf(RuntimeException.class)
-        .hasMessageContaining("Forbidden");
-  }
 }
