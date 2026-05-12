@@ -103,7 +103,6 @@ public class UserService {
     return mapToUserResponse(user, null);
   }
 
-  // TODO: 09/05/2026 this should move to separate service
   private String generatePasswordSetupToken(User user) {
     String token = UUID.randomUUID().toString();
     PasswordSetupTokenEntity passwordSetupTokenEntity =
