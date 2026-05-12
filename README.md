@@ -17,7 +17,7 @@ A Spring Boot REST API for a fictional bank. Users can create an account, manage
 ./gradlew bootRun
 ```
 
-The service starts on `http://localhost:8080`. The H2 console is available at `/h2-console`.
+The service starts on `http://localhost:8080`.
 
 ## Test
 
