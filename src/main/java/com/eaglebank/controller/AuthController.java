@@ -1,6 +1,7 @@
 package com.eaglebank.controller;
 
 import com.eaglebank.dto.AuthResponse;
+import com.eaglebank.dto.MessageResponse;
 import com.eaglebank.dto.SetPasswordRequest;
 import com.eaglebank.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ public class AuthController {
   }
 
   @PostMapping("/set-password")
-  public void setPassword(@RequestBody SetPasswordRequest request) {
-    authService.setPassword(request);
+  public MessageResponse setPassword(@RequestBody SetPasswordRequest request) {
+    return authService.setPassword(request);
   }
 }

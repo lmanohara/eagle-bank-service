@@ -1,5 +1,6 @@
 package com.eaglebank.service;
 
+import com.eaglebank.dto.MessageResponse;
 import com.eaglebank.dto.SetPasswordRequest;
 import com.eaglebank.entity.PasswordSetupTokenEntity;
 import com.eaglebank.entity.User;
@@ -60,7 +61,7 @@ public class AuthService {
   }
 
   @Transactional
-  public void setPassword(SetPasswordRequest request) {
+  public MessageResponse setPassword(SetPasswordRequest request) {
     PasswordSetupTokenEntity token =
         tokenRepo
             .findByTokenHashJoinUser(request.getToken())
@@ -86,5 +87,7 @@ public class AuthService {
 
     token.setUsed(true);
     tokenRepo.save(token);
+
+    return MessageResponse.builder().message("Password set successfully").build();
   }
 }
