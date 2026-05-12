@@ -25,6 +25,7 @@ venv/
 # Java/Gradle/Maven
 *.class
 *.jar
+!gradle/wrapper/gradle-wrapper.jar
 target/
 build/
 .gradle/
