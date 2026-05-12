@@ -5,8 +5,8 @@ import com.eaglebank.dto.TransactionResponse;
 import com.eaglebank.dto.TransactionsResponse;
 import com.eaglebank.entity.Account;
 import com.eaglebank.entity.AccountTransaction;
-import com.eaglebank.exception.BadRequestException;
 import com.eaglebank.exception.ResourceNotFoundException;
+import com.eaglebank.exception.TransactionException;
 import com.eaglebank.model.TransactionType;
 import com.eaglebank.repository.AccountRepository;
 import com.eaglebank.repository.AccountTransactionRepository;
@@ -110,7 +110,7 @@ public class AccountTransactionService {
   private Account updateAccountBalance(TransactionRequest transactionRequest, Account account) {
     if (transactionRequest.getAmount() == null
         || transactionRequest.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-      throw new BadRequestException("Invalid amount");
+      throw TransactionException.invalidAmount();
     }
 
     BigDecimal newBalance;
@@ -124,11 +124,11 @@ public class AccountTransactionService {
     } else if (type == TransactionType.WITHDRAW) {
       BigDecimal current = account.getBalance() == null ? BigDecimal.ZERO : account.getBalance();
       if (current.compareTo(transactionRequest.getAmount()) < 0) {
-        throw new BadRequestException("Insufficient funds");
+        throw TransactionException.insufficientFunds();
       }
       newBalance = current.subtract(transactionRequest.getAmount());
     } else {
-      throw new BadRequestException("Invalid transaction type");
+      throw TransactionException.invalidTransactionType();
     }
 
     account.setBalance(newBalance);
