@@ -19,5 +19,6 @@ spring:
       path: /h2-console
 
 jwt:
-  secret: my-secret-key-my-secret-key-my-secret-key
+  private-key: classpath:keys/jwt_private.pem
+  public-key: classpath:keys/jwt_public.pem
   expiration: 3600000

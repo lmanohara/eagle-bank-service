@@ -24,7 +24,7 @@ public class AuthController {
   }
 
   @PostMapping("/set-password")
-  public void setPassword(@RequestBody SetPasswordRequest req) {
-    authService.setPassword(req);
+  public void setPassword(@RequestBody SetPasswordRequest request) {
+    authService.setPassword(request);
   }
 }
