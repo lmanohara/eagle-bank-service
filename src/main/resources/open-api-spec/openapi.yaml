@@ -11,7 +11,78 @@ tags:
     description: Manage transactions on a bank account
   - name: user
     description: Manage a user
+  - name: auth
+    description: Authentication operations
 paths:
+  /v1/auth/token:
+    post:
+      tags:
+        - auth
+      description: |-
+        Exchange Basic credentials for a JWT bearer token. Send the username and password in the
+        standard `Authorization: Basic <base64(username:password)>` header.
+      operationId: authenticate
+      security:
+        - basicAuth: []
+      responses:
+        '200':
+          description: Authentication succeeded and a JWT token has been issued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: The Basic authentication header is malformed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        '401':
+          description: Invalid username or password, or missing Basic auth header
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        '500':
+          description: An unexpected error occurred
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /v1/auth/set-password:
+    post:
+      tags:
+        - auth
+      description: |-
+        Set a user's password using a one-time password setup token. The token is single-use and
+        time-limited; once consumed it cannot be reused.
+      operationId: setPassword
+      requestBody:
+        description: The password setup token along with the desired username and password
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetPasswordRequest'
+        required: true
+      responses:
+        '200':
+          description: The password has been set successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: The token is invalid, already used, expired, or the request is malformed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        '500':
+          description: An unexpected error occurred
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /v1/accounts:
     post:
       tags:
@@ -632,7 +703,7 @@ components:
             - "My Account"
         accountType:
           type: string
-          enum: 
+          enum:
             - "personal"
     UpdateBankAccountRequest:
       type: object
@@ -644,7 +715,7 @@ components:
             - "My Account"
         accountType:
           type: string
-          enum: 
+          enum:
             - "personal"
     ListBankAccountsResponse:
       type: object
@@ -654,7 +725,7 @@ components:
         accounts:
           type: array
           items:
-             $ref: "#/components/schemas/BankAccountResponse"
+            $ref: "#/components/schemas/BankAccountResponse"
     BankAccountResponse:
       type: object
       required:
@@ -675,13 +746,13 @@ components:
             - "01765432"
         sortCode:
           type: string
-          enum: 
+          enum:
             - "10-10-10"
         name:
           type: string
         accountType:
           type: string
-          enum: 
+          enum:
             - "personal"
         balance:
           type: number
@@ -724,7 +795,7 @@ components:
             - "GBP"
         type:
           type: string
-          enum: 
+          enum:
             - "deposit"
             - "withdrawal"
         reference:
@@ -737,7 +808,7 @@ components:
         transactions:
           type: array
           items:
-             $ref: "#/components/schemas/TransactionResponse"
+            $ref: "#/components/schemas/TransactionResponse"
     TransactionResponse:
       type: object
       required:
@@ -747,7 +818,7 @@ components:
         - type
         - createdTimestamp
       properties:
-        id: 
+        id:
           type: string
           pattern: ^tan-[A-Za-z0-9]$
           examples:
@@ -763,7 +834,7 @@ components:
             - "GBP"
         type:
           type: string
-          enum: 
+          enum:
             - "deposit"
             - "withdrawal"
         reference:
@@ -771,7 +842,7 @@ components:
         userId:
           type: string
           format: ^usr-[A-Za-z0-9]+$
-          examples: 
+          examples:
             - usr-abc123
         createdTimestamp:
           type: string
@@ -813,7 +884,7 @@ components:
           format: ^\+[1-9]\d{1,14}$
         email:
           type: string
-          format: email    
+          format: email
     UpdateUserRequest:
       type: object
       properties:
@@ -927,8 +998,45 @@ components:
                 type: string
               type:
                 type: string
+    AuthResponse:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+          description: Signed JWT bearer token to use in the `Authorization` header for subsequent requests
+    SetPasswordRequest:
+      type: object
+      required:
+        - token
+        - username
+        - password
+      properties:
+        token:
+          type: string
+          description: One-time password setup token issued when the user was created
+        username:
+          type: string
+          description: The username the user wants to authenticate with
+        password:
+          type: string
+          format: password
+          description: The password to set on the user account
+    MessageResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          examples:
+            - "Password set successfully"
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
+    basicAuth:
+      type: http
+      scheme: basic
